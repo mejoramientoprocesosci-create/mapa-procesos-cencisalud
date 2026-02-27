@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa de Procesos Cencisalud</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #00a8a8;
+    --teal-light: #00c4c4;
+    --navy: #2d3580;
+    --navy-dark: #1e2460;
+    --gray-bg: #f4f6f9;
+    --white: #ffffff;
+    --text-dark: #1a1a2e;
+    --text-mid: #4a4a6a;
+    --shadow: 0 8px 32px rgba(0,0,0,0.12);
+    --shadow-hover: 0 16px 48px rgba(0,168,168,0.25);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--gray-bg);
+    min-height: 100vh;
+    color: var(--text-dark);
+  }
+
+  /* HEADER */
+  header {
+    background: var(--white);
+    padding: 18px 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-icon {
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, var(--teal), var(--navy));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+
+  .logo-text {
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .logo-text .brand {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--navy);
+    letter-spacing: -0.5px;
+  }
+
+  .logo-text .brand span { color: var(--teal); }
+
+  .logo-text .subtitle {
+    font-size: 11px;
+    color: var(--text-mid);
+    font-weight: 400;
+    letter-spacing: 0.3px;
+  }
+
+  .header-title {
+    margin-left: auto;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  /* MAIN LAYOUT */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 36px 24px;
+  }
+
+  /* SECTION LABELS */
+  .side-labels {
+    display: grid;
+    grid-template-columns: 48px 1fr 48px;
+    gap: 20px;
+    align-items: stretch;
+  }
+
+  .side-label {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    background: linear-gradient(180deg, var(--teal) 0%, var(--navy) 100%);
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 0;
+  }
+
+  .side-label.right {
+    transform: rotate(180deg);
+  }
+
+  /* MAP CONTENT */
+  .map-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* PROCESS SECTIONS */
+  .section {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .section:hover {
+    box-shadow: var(--shadow);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 22px;
+    cursor: default;
+  }
+
+  .section-header.teal { background: linear-gradient(90deg, var(--teal) 0%, #00c9c9 100%); }
+  .section-header.navy { background: linear-gradient(90deg, var(--navy) 0%, #3a44aa 100%); }
+  .section-header.support { background: linear-gradient(90deg, var(--teal) 0%, #20b2b2 100%); }
+
+  .section-icon {
+    width: 38px;
+    height: 38px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 0.2px;
+  }
+
+  .section-body {
+    padding: 16px 22px 20px;
+  }
+
+  /* PROCESS GRID (for side-by-side sections) */
+  .dual-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* SUPPORT GRID */
+  .triple-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* CLICKABLE PROCESS ITEMS */
+  .process-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1.5px solid transparent;
+    margin-bottom: 6px;
+    position: relative;
+  }
+
+  .process-item:last-child { margin-bottom: 0; }
+
+  .process-item:hover {
+    background: linear-gradient(90deg, rgba(0,168,168,0.08), rgba(45,53,128,0.05));
+    border-color: var(--teal);
+    transform: translateX(4px);
+  }
+
+  .process-item.has-subs:hover .arrow-hint {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .process-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--teal);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .process-name {
+    font-size: 13.5px;
+    color: var(--text-mid);
+    font-weight: 500;
+    flex: 1;
+  }
+
+  .has-subs .process-name {
+    color: var(--navy);
+    font-weight: 600;
+  }
+
+  .sub-badge {
+    background: linear-gradient(135deg, var(--teal), var(--navy));
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .arrow-hint {
+    color: var(--teal);
+    font-size: 14px;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: all 0.2s ease;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 15, 40, 0.6);
+    backdrop-filter: blur(6px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    background: white;
+    border-radius: 24px;
+    width: 90%;
+    max-width: 540px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.25);
+    transform: translateY(30px) scale(0.96);
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+  }
+
+  .modal-overlay.active .modal {
+    transform: translateY(0) scale(1);
+  }
+
+  .modal-header {
+    padding: 28px 32px 22px;
+    background: linear-gradient(135deg, var(--navy) 0%, #3a44aa 100%);
+    position: relative;
+  }
+
+  .modal-header.teal-header {
+    background: linear-gradient(135deg, var(--teal) 0%, #006f6f 100%);
+  }
+
+  .modal-category {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .modal-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: white;
+    line-height: 1.3;
+    padding-right: 36px;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 20px;
+    right: 22px;
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.15);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .modal-close:hover { background: rgba(255,255,255,0.3); }
+
+  .modal-body {
+    padding: 28px 32px 32px;
+  }
+
+  .modal-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--teal);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .sub-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .sub-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: var(--gray-bg);
+    border: 1.5px solid transparent;
+    transition: all 0.2s ease;
+    cursor: default;
+    animation: slideIn 0.3s ease both;
+  }
+
+  .sub-item:hover {
+    background: linear-gradient(90deg, rgba(0,168,168,0.08), rgba(45,53,128,0.04));
+    border-color: rgba(0,168,168,0.3);
+    transform: translateX(4px);
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-12px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .sub-number {
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, var(--teal), var(--navy));
+    color: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .sub-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  .modal-footer {
+    padding: 0 32px 28px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .btn-back {
+    background: linear-gradient(135deg, var(--teal), var(--navy));
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-back:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,168,168,0.4);
+  }
+
+  /* VERSION */
+  .version-info {
+    text-align: right;
+    font-size: 11px;
+    color: #999;
+    margin-top: 20px;
+  }
+
+  /* TOOLTIP on hover */
+  .click-hint {
+    font-size: 11px;
+    color: var(--teal);
+    font-weight: 500;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <div class="logo-icon">🏥</div>
+    <div class="logo-text">
+      <div class="brand">CEN<span>C</span>IS</div>
+      <div class="subtitle">Centro de Excelencia para la Calidad, Investigación y Desarrollo en Salud</div>
+    </div>
+  </div>
+  <div class="header-title">Mapa de Procesos</div>
+</header>
+
+<div class="container">
+  <div class="side-labels">
+
+    <!-- LABEL IZQUIERDO -->
+    <div class="side-label">Necesidades y expectativas de los grupos de interés</div>
+
+    <!-- CONTENIDO CENTRAL -->
+    <div class="map-content">
+
+      <!-- ESTRATÉGICO -->
+      <div class="section">
+        <div class="section-header teal">
+          <div class="section-icon">📍</div>
+          <div class="section-title">Planeación y gestión empresarial</div>
+        </div>
+        <div class="section-body">
+          <div class="process-item has-subs" onclick="openModal('calidad')">
+            <div class="process-dot"></div>
+            <div class="process-name">Gestión y control del mejoramiento de la Calidad</div>
+            <span class="sub-badge">3 subprocesos</span>
+            <span class="arrow-hint">›</span>
+          </div>
+          <div class="click-hint">💡 Haz clic en un proceso para ver sus subprocesos</div>
+        </div>
+      </div>
+
+      <!-- MISIONAL: dos columnas -->
+      <div class="dual-section">
+        <div class="section">
+          <div class="section-header navy">
+            <div class="section-icon">📋</div>
+            <div class="section-title">Prestación de servicios</div>
+          </div>
+          <div class="section-body">
+            <div class="process-item has-subs" onclick="openModal('ambulatoria')">
+              <div class="process-dot"></div>
+              <div class="process-name">Atención ambulatoria del paciente</div>
+              <span class="sub-badge">6 subprocesos</span>
+              <span class="arrow-hint">›</span>
+            </div>
+            <div class="process-item" onclick="openModal('placeholder', 'Gestión de proyectos institucionales', 'navy')">
+              <div class="process-dot"></div>
+              <div class="process-name">Gestión de proyectos institucionales</div>
+              <span class="arrow-hint">›</span>
+            </div>
+            <div class="process-item" onclick="openModal('placeholder', 'Gestión de investigación', 'navy')">
+              <div class="process-dot"></div>
+              <div class="process-name">Gestión de investigación</div>
+              <span class="arrow-hint">›</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-header navy">
+            <div class="section-icon">🤝</div>
+            <div class="section-title">Servicio al cliente</div>
+          </div>
+          <div class="section-body">
+            <div class="process-item" onclick="openModal('placeholder', 'Gestión de atención al usuario', 'navy')">
+              <div class="process-dot"></div>
+              <div class="process-name">Gestión de atención al usuario</div>
+              <span class="arrow-hint">›</span>
+            </div>
+            <div class="process-item" onclick="openModal('placeholder', 'Gestión de alianzas estratégicas', 'navy')">
+              <div class="process-dot"></div>
+              <div class="process-name">Gestión de alianzas estratégicas</div>
+              <span class="arrow-hint">›</span>
+            </div>
+            <div class="process-item" onclick="openModal('placeholder', 'Mercadeo', 'navy')">
+              <div class="process-dot"></div>
+              <div class="process-name">Mercadeo</div>
+              <span class="arrow-hint">›</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEGUIMIENTO -->
+      <div class="section">
+        <div class="section-header teal">
+          <div class="section-icon">🔍</div>
+          <div class="section-title">Seguimiento y control</div>
+        </div>
+        <div class="section-body">
+          <div class="process-item" onclick="openModal('placeholder', 'Seguimiento y mejoramiento continuo', 'teal')">
+            <div class="process-dot"></div>
+            <div class="process-name">Seguimiento y mejoramiento continuo</div>
+            <span class="arrow-hint">›</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- APOYO: tres columnas -->
+      <div class="triple-section">
+        <div class="section">
+          <div class="section-header support">
+            <div class="section-icon">👥</div>
+            <div class="section-title">Gestión de talento humano</div>
+          </div>
+          <div class="section-body">
+            <div class="process-item" onclick="openModal('placeholder', 'Selección y vinculación', 'teal')">
+              <div class="process-dot"></div>
+              <div class="process-name">Selección y vinculación</div>
+              <span class="arrow-hint">›</span>
+            </div>
+            <div class="process-item" onclick="openModal('placeholder', 'Gestión del conocimiento', 'teal')">
+              <div class="process-dot"></div>
+              <div class="process-name">Gestión del conocimiento</div>
+              <span class="arrow-hint">›</span>
+            </div>
+            <div class="process-item" onclick="openModal('placeholder', 'SST', 'teal')">
+              <div class="process-dot"></div>
+              <div class="process-name">SST</div>
+              <span class="arrow-hint">›</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-header support">
+            <div class="section-icon">💰</div>
+            <div class="section-title">Gestión adtva. y financiera</div>
+          </div>
+          <div class="section-body">
+            <div class="process-item has-subs" onclick="openModal('administrativa')">
+              <div class="process-dot"></div>
+              <div class="process-name">Gestión administrativa</div>
+              <span class="sub-badge">1 subproceso</span>
+              <span class="arrow-hint">›</span>
+            </div>
+            <div class="process-item" onclick="openModal('placeholder', 'Gestión financiera', 'teal')">
+              <div class="process-dot"></div>
+              <div class="process-name">Gestión financiera</div>
+              <span class="arrow-hint">›</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-header support">
+            <div class="section-icon">💻</div>
+            <div class="section-title">Desarrollo tecnológico</div>
+          </div>
+          <div class="section-body">
+            <div class="process-item" onclick="openModal('placeholder', 'Gestión de la información', 'teal')">
+              <div class="process-dot"></div>
+              <div class="process-name">Gestión de la información</div>
+              <span class="arrow-hint">›</span>
+            </div>
+            <div class="process-item" onclick="openModal('placeholder', 'Soporte tecnológico', 'teal')">
+              <div class="process-dot"></div>
+              <div class="process-name">Soporte tecnológico</div>
+              <span class="arrow-hint">›</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- FIN CONTENIDO -->
+
+    <!-- LABEL DERECHO -->
+    <div class="side-label right">Satisfacción de los grupos de interés</div>
+
+  </div>
+
+  <div class="version-info">Versión: 5.0 &nbsp;|&nbsp; Fecha: 18/02/2022</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header" id="modalHeader">
+      <div class="modal-category" id="modalCategory">SUBPROCESOS</div>
+      <div class="modal-title" id="modalTitle"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-label">SUBPROCESOS ASOCIADOS</div>
+      <div class="sub-list" id="subList"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-back" onclick="closeModal()">← Volver al mapa</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const DATA = {
+    calidad: {
+      title: "Gestión y control del mejoramiento de la Calidad",
+      category: "PLANEACIÓN Y GESTIÓN EMPRESARIAL",
+      headerClass: "teal-header",
+      subs: ["Calidad", "Igualdad de género", "Ambiental"]
+    },
+    ambulatoria: {
+      title: "Atención ambulatoria del paciente",
+      category: "PRESTACIÓN DE SERVICIOS",
+      headerClass: "",
+      subs: ["CAT", "Farmacovigilancia", "PSP", "Servicio farmacéutico", "Visita domiciliaria", "Seguimiento"]
+    },
+    administrativa: {
+      title: "Gestión administrativa",
+      category: "GESTIÓN ADTVA. Y FINANCIERA",
+      headerClass: "teal-header",
+      subs: ["Tecnovigilancia"]
+    }
+  };
+
+  function openModal(key, placeholderName, color) {
+    const overlay = document.getElementById('modalOverlay');
+    const header = document.getElementById('modalHeader');
+    const title = document.getElementById('modalTitle');
+    const category = document.getElementById('modalCategory');
+    const list = document.getElementById('subList');
+
+    if (key === 'placeholder') {
+      title.textContent = placeholderName;
+      category.textContent = 'PROCESO';
+      header.className = 'modal-header' + (color === 'teal' ? ' teal-header' : '');
+      list.innerHTML = `
+        <div style="text-align:center; padding: 28px 0; color: #999;">
+          <div style="font-size: 36px; margin-bottom: 12px;">🔧</div>
+          <div style="font-weight: 600; color: #555; margin-bottom: 6px;">Subprocesos en configuración</div>
+          <div style="font-size: 13px;">Agrega los subprocesos de este proceso para verlos aquí.</div>
+        </div>`;
+    } else {
+      const d = DATA[key];
+      title.textContent = d.title;
+      category.textContent = d.category;
+      header.className = 'modal-header ' + (d.headerClass || '');
+      list.innerHTML = d.subs.map((s, i) => `
+        <div class="sub-item" style="animation-delay: ${i * 0.06}s">
+          <div class="sub-number">${String(i+1).padStart(2,'0')}</div>
+          <div class="sub-name">${s}</div>
+        </div>`).join('');
+    }
+
+    overlay.classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('active');
+  }
+
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
